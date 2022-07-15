@@ -201,7 +201,7 @@ local function detect_auto_settings(event, image)
         apply_tag(image, "DR400")
         dt.print_log("[fujifilm_auto_settings] DR400")
     end
-
+--[[
     -- cropmode
     local raw_aspect_ratio = exiftool_get(exiftool_command, RAF_filename, "-RawImageAspectRatio")
     if raw_aspect_ratio == "3:2" then
@@ -224,7 +224,7 @@ local function detect_auto_settings(event, image)
         apply_tag(image, "16:9")
         dt.print_log("[fujifilm_auto_settings] 16:9 crop")
     end
-
+--]]
     -- filmmode
     local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
     local style_map = {
