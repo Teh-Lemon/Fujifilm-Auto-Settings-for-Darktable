@@ -228,29 +228,37 @@ local function detect_auto_settings(event, image)
     -- filmmode
     local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
     local style_map = {
-        ["Provia"] = "provia",
-        ["Astia"] = "astia",
-        ["Classic Chrome"] = "classic_chrome",
-        ["Eterna"] = "eterna",
-        ["Acros+G"] = "acros_green",
-        ["Acros+R"] = "acros_red",
-        ["Acros+Ye"] = "acros_yellow",
-        ["Acros"] = "acros",
-        ["Mono+G"] = "mono_green",
-        ["Mono+R"] = "mono_red",
-        ["Mono+Ye"] = "mono_yellow",
-        ["Mono"] = "mono",
-        ["Pro Neg Hi"] = "pro_neg_high",
-        ["Pro Neg Std"] = "pro_neg_standard",
-        ["Sepia"] = "sepia",
-        ["Velvia"] = "velvia",
+        ["Provia"] = "Fujifilm LUTs|Provia",
+        ["Astia"] = "Fujifilm LUTs|Astia",
+        ["Classic Chrome"] = "Fujifilm LUTs|Classic Chrome",
+        ["Eterna"] = "Fujifilm LUTs|Eterna",
+        --["Acros+G"] = "acros_green",
+        --["Acros+R"] = "acros_red",
+        --["Acros+Ye"] = "acros_yellow",
+        --["Acros"] = "Fujifilm LUTs|Acros",
+        --["Mono+G"] = "mono_green",
+        --["Mono+R"] = "mono_red",
+        --["Mono+Ye"] = "mono_yellow",
+        --["Mono"] = "mono",
+        ["Pro Neg. Hi"] = "Fujifilm LUTs|Pro Neg Hi",
+        ["Pro Neg. Std"] = "Fujifilm LUTs|Pro Neg Std",
+        --["Sepia"] = "sepia",
+        ["Velvia"] = "Fujifilm LUTs|Velvia",
+        --["Classic Negative"] = "Fujifilm LUTs|Classic Negative",
     }
+    local filmmode_success = false
     for key, value in pairs(style_map) do
         if string.find(raw_filmmode, key) then
             apply_style(image, value)
             apply_tag(image, key)
-            dt.print_log("[fujifilm_auto_settings] film simulation " .. key)
-        end
+            filmmode_success = true
+            dt.print_log("[fujifilm_auto_settings] film simulation " .. key)                    
+            break
+        end        
+    end
+
+    if not filmmode_success then
+        dt.print_log("[fujifilm_auto_settings] film simulation " .. raw_filmmode .. " does not match anything in style_map")
     end
 end
 
