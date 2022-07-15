@@ -193,11 +193,11 @@ local function detect_auto_settings(event, image)
         apply_tag(image, "DR100")
         -- default; no need to change style
     elseif auto_dynamic_range == "200%" then
-        apply_style(image, "DR200")
+        apply_style(image, "Fujifilm DR|DR200")
         apply_tag(image, "DR200")
         dt.print_log("[fujifilm_auto_settings] DR200")
     elseif auto_dynamic_range == "400%" then
-        apply_style(image, "DR400")
+        apply_style(image, "Fujifilm DR|DR400")
         apply_tag(image, "DR400")
         dt.print_log("[fujifilm_auto_settings] DR400")
     end
