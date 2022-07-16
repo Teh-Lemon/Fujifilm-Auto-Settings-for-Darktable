@@ -1,3 +1,26 @@
+## Lemon Fork Changes
+
+* Ported to Windows
+* Disabled Aspect Ratio styles
+* Categorized the styles in Darktable
+* Converted Bastibe's HaldCLUT LUTs to g'mic compressed LUTs
+* Added Acros and Classic Neg LUTs as g'mic compressed LUTs
+    * Acros is provided by [Stuart Sowerby](https://blog.sowerby.me/fuji-film-simulation-profiles/)
+    * Classic Neg is provided by [Marc R. Photography](https://marcrphoto.wordpress.com/2021/03/25/picturefx-pro-fujifilm-superia-200/)
+* Fixes all the broken film simulation detections
+
+## Lemon Fork Install Instructions
+
+1. Download and extract the Windows version of [exiftools](https://exiftool.org/) somewhere permanent and rename it to `exiftool.exe`.
+2. Install exiftools to your PATH variable ([Tutorial](https://www.computerhope.com/issues/ch000549.htm)).
+3. Copy `fujifilm_auto_settings.lua` to your `C:\Users\YOUR_NAME\AppData\Local\darktable\lua\contrib` folder.
+4. Copy the `Fuji XTrans VII` folder to your `3D lut root folder` (that you set in Darktable's `preferences/processing`).  
+    4a. You only need the `.gmz` files. The .png files are not used in this fork.
+5. Inside Darktable, import the `DR200.dtstyle` and `DR400.dtstyle` styles found inside the repo's `styles` folder.  
+    5a. The crop styles are not used in this fork
+6. Inside Darktable, import the styles found inside the `styles/gmz LUTs` folder.
+7. Enable the script inside Darktable's LUA panel.
+
 # Fujifilm Auto Settings for Darktable
 
 This repository contains styles and scripts and LUTs to automatically read and apply

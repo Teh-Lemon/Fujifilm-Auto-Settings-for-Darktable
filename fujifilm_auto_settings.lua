@@ -146,17 +146,22 @@ local function exiftool_get(exiftool_command, RAF_filename, flag)
         return
     end
     exiftool_result = exiftool_result:match("^%s*(.-)%s*$") -- strip whitespace
+
+    dt.print_log("[fujifilm_auto_settings] exiftool result: " .. exiftool_result)
+
     return exiftool_result
 end
 
 local function apply_style(image, style_name)
+    dt.print_log("[fujifilm_auto_settings] Attempting to apply style: " .. style_name)
     for _, s in ipairs(dt.styles) do
         if s.name == style_name then
             dt.styles.apply(s, image)
-            return
+            return true
         end
     end
     dt.print_error("[fujifilm_auto_settings] could not find style " .. style_name)
+    return false
 end
 
 local function apply_tag(image, tag_name)
@@ -169,6 +174,55 @@ local function apply_tag(image, tag_name)
     dt.tags.attach(tagnum, image)
 end
 
+-- Lemon fork extra functions
+
+local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
+    local raw_filmmode = exiftool_get(bw_cmd, bw_filename, "-Saturation")
+    local style_map = {        
+        ["Acros Green Filter"] = "Acros G",
+        ["Acros Red Filter"] = "Acros R",
+        ["Acros Yellow Filter"] = "Acros Ye",
+        ["Acros"] = "Acros"
+        -- Unsupported film modes since I've never seen anyone use them
+        --["None (B&W)"] = "mono",
+        --["B&W Green Filter"] = "mono_green",
+        --["B&W Red Filter"] = "mono_red",
+        --["B&W Yellow Filter"] = "mono_yellow",
+        --["B&W Sepia"] = "sepia"
+    }
+    local filmmode_success = false
+
+    -- check if -saturation returns anything
+    if #raw_filmmode == 0 then
+        dt.print_log("[fujifilm_auto_settings] -Saturation did not return anything")
+        return false
+    end
+
+    -- See if the -saturation match any supported styles
+    for key, value in pairs(style_map) do
+        if raw_filmmode == key then
+
+            if use_categorized_styles then
+                apply_style(bw_image, lut_style_category .. value)
+            else
+                apply_style(bw_image, value)
+            end
+
+            apply_tag(bw_image, key)
+            filmmode_success = true
+            dt.print_log("[fujifilm_auto_settings] b&w film simulation style map found: " .. key)
+            break
+        end
+    end
+
+    if not filmmode_success then
+        dt.print_log("[fujifilm_auto_settings] -Saturation " .. raw_filmmode .. " does not match anything in b&w film style_map")
+    end
+
+    return filmmode_success
+end
+
+-- Lemon fork end 
 
 local function detect_auto_settings(event, image)
     if image.exif_maker ~= "FUJIFILM" then
@@ -248,45 +302,50 @@ local function detect_auto_settings(event, image)
     end
 --]]
     -- filmmode
+    local filmmode_success = false
     local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
     local style_map = {
         ["Provia"] = "Provia",
         ["Astia"] = "Astia",
         ["Classic Chrome"] = "Classic Chrome",
         ["Eterna"] = "Eterna",
-        --["Acros Green Filter"] = "acros_green",
-        --["Acros Red Filter"] = "acros_red",
-        --["Acros Yellow Filter"] = "acros_yellow",
-        --["Acros"] = "Fujifilm LUTs|Acros",
-        --["Mono+G"] = "mono_green",
-        --["Mono+R"] = "mono_red",
-        --["Mono+Ye"] = "mono_yellow",
-        --["Mono"] = "mono",
         ["Pro Neg. Hi"] = "Pro Neg Hi",
         ["Pro Neg. Std"] = "Pro Neg Std",
-        --["Sepia"] = "sepia",
         ["Velvia"] = "Velvia",
-        ["Classic Negative"] = "Classic Negative",
+        ["Classic Negative"] = "Classic Negative"
     }
-    local filmmode_success = false
-    for key, value in pairs(style_map) do
-        if string.find(raw_filmmode, key) then
-            
-            if use_categorized_styles then
-                apply_style(image, lut_style_category .. value)
-            else
-                apply_style(image, value)
+
+    -- If we get a filmmode back then it's a color simulation
+    if raw_filmmode then
+        for key, value in pairs(style_map) do
+            if string.find(raw_filmmode, key) then
+
+                if use_categorized_styles then
+                    apply_style(image, lut_style_category .. value)
+                else
+                    apply_style(image, value)
+                end
+
+                apply_tag(image, key)
+                filmmode_success = true
+                dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
+                break
             end
+        end
 
-            apply_tag(image, key)
-            filmmode_success = true
-            dt.print_log("[fujifilm_auto_settings] film simulation " .. key)                    
-            break
-        end        
+        if not filmmode_success then
+            dt.print_log("[fujifilm_auto_settings] -filmmode " .. raw_filmmode .. " does not match anything in color style_map")
+        end
+    -- If a film returns empty, it might be a black&white simulation    
+    else
+        dt.print_log("[fujifilm_auto_settings] -filmmode returned empty")
+        dt.print_log("[fujifilm_auto_settings] checking -saturation in for b&w styles...")
+        -- Check to see if it matches a supported b&w film simulation
+        filmmode_success = find_bw_filmmode(exiftool_command, RAF_filename, image)
     end
-
+    
     if not filmmode_success then
-        dt.print_log("[fujifilm_auto_settings] film simulation " .. raw_filmmode .. " does not match anything in style_map")
+        dt.print_log("[fujifilm_auto_settings] neither -filmmode or -saturation matched anything in their style_map's")
     end
 end
 
