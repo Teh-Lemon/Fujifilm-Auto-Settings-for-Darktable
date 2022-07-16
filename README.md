@@ -1,7 +1,7 @@
 ## Lemon Fork Changes
 
 * Ported to Windows
-* Disabled Aspect Ratio styles
+* Disabled Aspect Ratio styles (I don't use them)
 * Categorized the styles in Darktable
 * Converted Bastibe's HaldCLUT LUTs to g'mic compressed LUTs
 * Added Acros and Classic Neg LUTs as g'mic compressed LUTs
