@@ -8,7 +8,8 @@
     * Acros is provided by [Stuart Sowerby](https://blog.sowerby.me/fuji-film-simulation-profiles/)
     * Classic Neg is provided by [Marc R. Photography](https://marcrphoto.wordpress.com/2021/03/25/picturefx-pro-fujifilm-superia-200/)
 * Fixes all the broken film simulation detections
-
+    * Note: I did not add support for the Monochrome and Sepia simulations
+* Tested using photos from an XT-20
 ## Lemon Fork Install Instructions
 
 1. Download and extract the Windows version of [exiftools](https://exiftool.org/) somewhere permanent and rename it to `exiftool.exe`.
