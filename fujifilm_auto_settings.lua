@@ -111,6 +111,11 @@ cameras may behave in other ways.
 
 --]]
 
+-- Lemon variables
+local use_categorized_styles = true
+local lut_style_category = "Fujifilm LUTs|"
+local dr_style_category = "Fujifilm DR|"
+
 local dt = require "darktable"
 local du = require "lib/dtutils"
 local df = require "lib/dtutils.file"
@@ -186,7 +191,7 @@ local function detect_auto_settings(event, image)
     -- if in DR Auto, the value is saved to Auto Dynamic Range, with a % suffix:
     local auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-AutoDynamicRange")
     -- if manually chosen DR, the value is saved to Development Dynamic Range:
-    if auto_dynamic_range == nil then
+    if auto_dynamic_range == nil then        
         auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-DevelopmentDynamicRange") .. '%'
     end
     if auto_dynamic_range == "100%" then
@@ -228,28 +233,34 @@ local function detect_auto_settings(event, image)
     -- filmmode
     local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
     local style_map = {
-        ["Provia"] = "Fujifilm LUTs|Provia",
-        ["Astia"] = "Fujifilm LUTs|Astia",
-        ["Classic Chrome"] = "Fujifilm LUTs|Classic Chrome",
-        ["Eterna"] = "Fujifilm LUTs|Eterna",
-        --["Acros+G"] = "acros_green",
-        --["Acros+R"] = "acros_red",
-        --["Acros+Ye"] = "acros_yellow",
+        ["Provia"] = "Provia",
+        ["Astia"] = "Astia",
+        ["Classic Chrome"] = "Classic Chrome",
+        ["Eterna"] = "Eterna",
+        --["Acros Green Filter"] = "acros_green",
+        --["Acros Red Filter"] = "acros_red",
+        --["Acros Yellow Filter"] = "acros_yellow",
         --["Acros"] = "Fujifilm LUTs|Acros",
         --["Mono+G"] = "mono_green",
         --["Mono+R"] = "mono_red",
         --["Mono+Ye"] = "mono_yellow",
         --["Mono"] = "mono",
-        ["Pro Neg. Hi"] = "Fujifilm LUTs|Pro Neg Hi",
-        ["Pro Neg. Std"] = "Fujifilm LUTs|Pro Neg Std",
+        ["Pro Neg. Hi"] = "Pro Neg Hi",
+        ["Pro Neg. Std"] = "Pro Neg Std",
         --["Sepia"] = "sepia",
-        ["Velvia"] = "Fujifilm LUTs|Velvia",
-        --["Classic Negative"] = "Fujifilm LUTs|Classic Negative",
+        ["Velvia"] = "Velvia",
+        ["Classic Negative"] = "Classic Negative",
     }
     local filmmode_success = false
     for key, value in pairs(style_map) do
         if string.find(raw_filmmode, key) then
-            apply_style(image, value)
+            
+            if use_categorized_styles then
+                apply_style(image, lut_style_category .. value)
+            else
+                apply_style(image, value)
+            end
+
             apply_tag(image, key)
             filmmode_success = true
             dt.print_log("[fujifilm_auto_settings] film simulation " .. key)                    
