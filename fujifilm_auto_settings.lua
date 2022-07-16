@@ -132,7 +132,7 @@ script_data.restart = nil -- how to restart the (lib) script after it's been hid
 
 local function exiftool_get(exiftool_command, RAF_filename, flag)
     local command = '"' .. exiftool_command .. " " .. flag .. " -t " .. RAF_filename .. '"'
-    dt.print_log(command)
+    dt.print_log("[fujifilm_auto_settings] " .. command)
     local output = io.popen(command)
     local exiftool_result = output:read("*all")
     output:close()
@@ -177,7 +177,7 @@ local function detect_auto_settings(event, image)
     end
     -- it would be nice to check image.is_raw but this appears to not yet be set
     if not string.match(image.filename, "%.RAF$") then
-        dt.print_log("[fujifilm_auto_settings] ignoring non-raw image")
+        dt.print_log("[fujifilm_auto_settings] ignoring non-raw non-Fujifilm image")
         return
     end
     local exiftool_command = df.check_if_bin_exists("exiftool")
@@ -188,23 +188,40 @@ local function detect_auto_settings(event, image)
     local RAF_filename = df.sanitize_filename(tostring(image))
 
     -- dynamic range mode
-    -- if in DR Auto, the value is saved to Auto Dynamic Range, with a % suffix:
+    -- if in DR Auto, the value is saved to Auto Dynamic Range:
     local auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-AutoDynamicRange")
-    -- if manually chosen DR, the value is saved to Development Dynamic Range:
+
+    -- if manually chosen DR, the value is saved to Development Dynamic Range, with a % suffix:
     if auto_dynamic_range == nil then        
         auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-DevelopmentDynamicRange") .. '%'
+        dt.print_log("[fujifilm_auto_settings] Manual DR detected: " .. auto_dynamic_range)
+    else
+        dt.print_log("[fujifilm_auto_settings] Auto DR detected: " .. auto_dynamic_range)
     end
+
     if auto_dynamic_range == "100%" then
         apply_tag(image, "DR100")
         -- default; no need to change style
+
     elseif auto_dynamic_range == "200%" then
-        apply_style(image, "Fujifilm DR|DR200")
+        if use_categorized_styles then
+            apply_style(image, dr_style_category .. "DR200")
+        else
+            apply_style(image, "DR200")
+        end
+
         apply_tag(image, "DR200")
-        dt.print_log("[fujifilm_auto_settings] DR200")
+        dt.print_log("[fujifilm_auto_settings] DR200 applied")
+
     elseif auto_dynamic_range == "400%" then
-        apply_style(image, "Fujifilm DR|DR400")
+        if use_categorized_styles then
+            apply_style(image, dr_style_category .. "DR400")
+        else
+            apply_style(image, "DR400")
+        end
+
         apply_tag(image, "DR400")
-        dt.print_log("[fujifilm_auto_settings] DR400")
+        dt.print_log("[fujifilm_auto_settings] DR400 applied")
     end
 --[[
     -- cropmode
