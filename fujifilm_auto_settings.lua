@@ -147,7 +147,7 @@ local function exiftool_get(exiftool_command, RAF_filename, flag)
     end
     exiftool_result = exiftool_result:match("^%s*(.-)%s*$") -- strip whitespace
 
-    dt.print_log("[fujifilm_auto_settings] exiftool result: " .. exiftool_result)
+    --dt.print_log("[fujifilm_auto_settings] exiftool result: " .. exiftool_result)
 
     return exiftool_result
 end
@@ -194,7 +194,7 @@ local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
 
     -- check if -saturation returns anything
     if #raw_filmmode == 0 then
-        dt.print_log("[fujifilm_auto_settings] -Saturation did not return anything")
+        dt.print_log("[fujifilm_auto_settings] -Saturation did not return anything either")
         return false
     end
 
@@ -210,7 +210,7 @@ local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
 
             apply_tag(bw_image, key)
             filmmode_success = true
-            dt.print_log("[fujifilm_auto_settings] b&w film simulation style map found: " .. key)
+            --dt.print_log("[fujifilm_auto_settings] b&w film simulation style map found: " .. key)
             break
         end
     end
@@ -248,9 +248,9 @@ local function detect_auto_settings(event, image)
     -- if manually chosen DR, the value is saved to Development Dynamic Range, with a % suffix:
     if auto_dynamic_range == nil then        
         auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-DevelopmentDynamicRange") .. '%'
-        dt.print_log("[fujifilm_auto_settings] Manual DR detected: " .. auto_dynamic_range)
+        --dt.print_log("[fujifilm_auto_settings] Manual DR detected: " .. auto_dynamic_range)
     else
-        dt.print_log("[fujifilm_auto_settings] Auto DR detected: " .. auto_dynamic_range)
+        --dt.print_log("[fujifilm_auto_settings] Auto DR detected: " .. auto_dynamic_range)
     end
 
     if auto_dynamic_range == "100%" then
@@ -265,7 +265,7 @@ local function detect_auto_settings(event, image)
         end
 
         apply_tag(image, "DR200")
-        dt.print_log("[fujifilm_auto_settings] DR200 applied")
+        --dt.print_log("[fujifilm_auto_settings] DR200 applied")
 
     elseif auto_dynamic_range == "400%" then
         if use_categorized_styles then
@@ -275,7 +275,7 @@ local function detect_auto_settings(event, image)
         end
 
         apply_tag(image, "DR400")
-        dt.print_log("[fujifilm_auto_settings] DR400 applied")
+        --dt.print_log("[fujifilm_auto_settings] DR400 applied")
     end
 --[[
     -- cropmode
@@ -328,7 +328,7 @@ local function detect_auto_settings(event, image)
 
                 apply_tag(image, key)
                 filmmode_success = true
-                dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
+                --dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
                 break
             end
         end
@@ -338,8 +338,8 @@ local function detect_auto_settings(event, image)
         end
     -- If a film returns empty, it might be a black&white simulation    
     else
-        dt.print_log("[fujifilm_auto_settings] -filmmode returned empty")
-        dt.print_log("[fujifilm_auto_settings] checking -saturation in for b&w styles...")
+        --dt.print_log("[fujifilm_auto_settings] -filmmode returned empty")
+        --dt.print_log("[fujifilm_auto_settings] checking -saturation in for b&w styles...")
         -- Check to see if it matches a supported b&w film simulation
         filmmode_success = find_bw_filmmode(exiftool_command, RAF_filename, image)
     end
