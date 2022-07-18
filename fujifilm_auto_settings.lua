@@ -169,23 +169,23 @@ local function apply_tag(image, tag_name)
         tagnum = dt.tags.create(tag_name)
         dt.print_log("[fujifilm_auto_settings] creating tag " .. tag_name)
     end
-    dt.tags.attach(tagnum, image)
+    dt.tags.attach(tagnum, image)   
 end
 
 -- Lemon fork extra functions
 
 local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
     local raw_filmmode = exiftool_get(bw_cmd, bw_filename, "-Saturation")
-    local style_map = {        
+    local style_map = {
         ["Acros Green Filter"] = "Acros G",
         ["Acros Red Filter"] = "Acros R",
         ["Acros Yellow Filter"] = "Acros Ye",
         ["Acros"] = "Acros",
         -- Unsupported film modes since I've never seen anyone use them
         ["None (B&W)"] = "Acros",
-        ["B&W Green Filter"] = "Acros",
-        ["B&W Red Filter"] = "Acros",
-        ["B&W Yellow Filter"] = "Acros",
+        ["B&W Green Filter"] = "Acros G",
+        ["B&W Red Filter"] = "Acros R",
+        ["B&W Yellow Filter"] = "Acros Ye",
         ["B&W Sepia"] = "Acros"
     }
     local filmmode_success = false
