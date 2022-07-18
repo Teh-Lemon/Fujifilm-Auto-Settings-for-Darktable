@@ -180,7 +180,7 @@ local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
         ["Acros Green Filter"] = "Acros G",
         ["Acros Red Filter"] = "Acros R",
         ["Acros Yellow Filter"] = "Acros Ye",
-        ["Acros"] = "Acros"
+        ["Acros"] = "Acros",
         -- Unsupported film modes since I've never seen anyone use them
         ["None (B&W)"] = "Acros",
         ["B&W Green Filter"] = "Acros",
