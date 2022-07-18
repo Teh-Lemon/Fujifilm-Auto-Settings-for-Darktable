@@ -26,7 +26,6 @@ chosen dynamic range setting in camera.
 
 Dependencies:
 - exiftool (https://www.sno.phy.queensu.ca/~phil/exiftool/)
-- Fuji LUTs (https://blog.sowerby.me/fuji-film-simulation-profiles/)
 
 Based on fujifim_dynamic_range by Dan Torop.
 
@@ -112,8 +111,7 @@ cameras may behave in other ways.
 --]]
 
 -- Lemon variables
-local use_categorized_styles = true
-local lut_style_category = "Fujifilm LUTs|"
+local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
 local dr_style_category = "Fujifilm DR|"
 
 local dt = require "darktable"
@@ -184,11 +182,11 @@ local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
         ["Acros Yellow Filter"] = "Acros Ye",
         ["Acros"] = "Acros"
         -- Unsupported film modes since I've never seen anyone use them
-        --["None (B&W)"] = "mono",
-        --["B&W Green Filter"] = "mono_green",
-        --["B&W Red Filter"] = "mono_red",
-        --["B&W Yellow Filter"] = "mono_yellow",
-        --["B&W Sepia"] = "sepia"
+        ["None (B&W)"] = "Acros",
+        ["B&W Green Filter"] = "Acros",
+        ["B&W Red Filter"] = "Acros",
+        ["B&W Yellow Filter"] = "Acros",
+        ["B&W Sepia"] = "Acros"
     }
     local filmmode_success = false
 
@@ -201,13 +199,7 @@ local function find_bw_filmmode(bw_cmd, bw_filename, bw_image)
     -- See if the -saturation match any supported styles
     for key, value in pairs(style_map) do
         if raw_filmmode == key then
-
-            if use_categorized_styles then
-                apply_style(bw_image, lut_style_category .. value)
-            else
-                apply_style(bw_image, value)
-            end
-
+            apply_style(bw_image, lut_style_category .. value)
             apply_tag(bw_image, key)
             filmmode_success = true
             --dt.print_log("[fujifilm_auto_settings] b&w film simulation style map found: " .. key)
@@ -258,22 +250,12 @@ local function detect_auto_settings(event, image)
         -- default; no need to change style
 
     elseif auto_dynamic_range == "200%" then
-        if use_categorized_styles then
-            apply_style(image, dr_style_category .. "DR200")
-        else
-            apply_style(image, "DR200")
-        end
-
+        apply_style(image, dr_style_category .. "DR200")
         apply_tag(image, "DR200")
         --dt.print_log("[fujifilm_auto_settings] DR200 applied")
 
     elseif auto_dynamic_range == "400%" then
-        if use_categorized_styles then
-            apply_style(image, dr_style_category .. "DR400")
-        else
-            apply_style(image, "DR400")
-        end
-
+        apply_style(image, dr_style_category .. "DR400")
         apply_tag(image, "DR400")
         --dt.print_log("[fujifilm_auto_settings] DR400 applied")
     end
@@ -319,13 +301,7 @@ local function detect_auto_settings(event, image)
     if raw_filmmode then
         for key, value in pairs(style_map) do
             if string.find(raw_filmmode, key) then
-
-                if use_categorized_styles then
-                    apply_style(image, lut_style_category .. value)
-                else
-                    apply_style(image, value)
-                end
-
+                apply_style(image, lut_style_category .. value)
                 apply_tag(image, key)
                 filmmode_success = true
                 --dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
