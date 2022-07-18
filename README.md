@@ -10,7 +10,7 @@
     * Classic Neg is provided by [Marc R. Photography](https://marcrphoto.wordpress.com/2021/03/25/picturefx-pro-fujifilm-superia-200/)
 * Fixes all the broken film simulation detections
     * Note: I did not add LUTs for the Monochrome/Sepia simulations - These fallback to Acros styles
-* Not-rigorously tested using photos from an XT-20. Use at your own risk.
+* Not-rigorously tested using photos from an X-T20. Use at your own risk.
 ## Lemon Fork Install Instructions
 
 1. Download and extract the Windows version of [exiftools](https://exiftool.org/) somewhere permanent and rename it to `exiftool.exe`.
