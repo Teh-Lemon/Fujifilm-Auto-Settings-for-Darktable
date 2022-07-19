@@ -221,18 +221,18 @@ local function detect_auto_settings(event, image)
             apply_tag(image, "3:2")
             -- default; no need to apply style
         elseif raw_aspect_ratio == "1:1" then
-            if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
-                apply_style(image, crop_style_category .. "1:1 Landscape")
-            else
+            if raw_orientation == "Rotate 90 CW" or raw_orientation == "Rotate 270 CW" then
                 apply_style(image, crop_style_category .. "1:1 Portrait")
+            else
+                apply_style(image, crop_style_category .. "1:1 Landscape")
             end
             apply_tag(image, "1:1")
             dt.print_log("[fujifilm_auto_settings] square crop")
         elseif raw_aspect_ratio == "16:9" then
-            if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
-                apply_style(image, crop_style_category .. "16:9 Landscape")
-            else
+            if raw_orientation == "Rotate 90 CW" or raw_orientation == "Rotate 270 CW" then
                 apply_style(image, crop_style_category .. "16:9 Portrait")
+            else
+                apply_style(image, crop_style_category .. "16:9 Landscape")
             end
             apply_tag(image, "16:9")
             dt.print_log("[fujifilm_auto_settings] 16:9 crop")
