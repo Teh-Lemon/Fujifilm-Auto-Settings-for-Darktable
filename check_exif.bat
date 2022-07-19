@@ -5,6 +5,7 @@ FOR %%i IN (*.raf) DO (
 	exiftool -AutoDynamicRange %%i
 	exiftool -DevelopmentDynamicRange %%i
 	exiftool -RawImageAspectRatio %%i
+	exiftool -Orientation %%i
 	exiftool -FilmMode %%i
 	exiftool -Saturation %%i
 	)
