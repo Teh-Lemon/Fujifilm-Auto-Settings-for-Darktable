@@ -3,7 +3,10 @@ local os_is_windows = true --change to false if you're using Linux
 local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
 local dr_style_category = "Fujifilm DR|"
 
-local apply_crop_styles = false -- Set to true if you want the script to apply the crop styles
+local apply_dr_styles = true -- Whether to apply the DR styles
+local apply_crop_styles = false -- Whether to apply the crop styles
+local apply_film_styles = true -- Whether to apply the film styles
+
 
 --[[ fujifilm_auto_settings-0.3
 
@@ -226,30 +229,31 @@ local function detect_auto_settings(event, image)
     local RAF_filename = df.sanitize_filename(tostring(image))
 
     -- dynamic range mode
-    -- if in DR Auto, the value is saved to Auto Dynamic Range:
-    local auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-AutoDynamicRange")
+    if apply_dr_styles then
+        -- if in DR Auto, the value is saved to Auto Dynamic Range:
+        local auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-AutoDynamicRange")
 
-    -- if manually chosen DR, the value is saved to Development Dynamic Range, with a % suffix:
-    if auto_dynamic_range == nil then        
-        auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-DevelopmentDynamicRange") .. '%'
-        --dt.print_log("[fujifilm_auto_settings] Manual DR detected: " .. auto_dynamic_range)
-    else
-        --dt.print_log("[fujifilm_auto_settings] Auto DR detected: " .. auto_dynamic_range)
-    end
+        -- if manually chosen DR, the value is saved to Development Dynamic Range, with a % suffix:
+        if auto_dynamic_range == nil then        
+            auto_dynamic_range = exiftool_get(exiftool_command, RAF_filename, "-DevelopmentDynamicRange") .. '%'
+            --dt.print_log("[fujifilm_auto_settings] Manual DR detected: " .. auto_dynamic_range)
+        else
+            --dt.print_log("[fujifilm_auto_settings] Auto DR detected: " .. auto_dynamic_range)
+        end    
 
-    if auto_dynamic_range == "100%" then
-        apply_tag(image, "DR100")
-        -- default; no need to change style
-
-    elseif auto_dynamic_range == "200%" then
-        apply_style(image, dr_style_category .. "DR200")
-        apply_tag(image, "DR200")
-        --dt.print_log("[fujifilm_auto_settings] DR200 applied")
-
-    elseif auto_dynamic_range == "400%" then
-        apply_style(image, dr_style_category .. "DR400")
-        apply_tag(image, "DR400")
-        --dt.print_log("[fujifilm_auto_settings] DR400 applied")
+        -- Apply the DR styles
+        if auto_dynamic_range == "100%" then
+            apply_tag(image, "DR100")
+            -- default; no need to change style
+        elseif auto_dynamic_range == "200%" then
+            apply_style(image, dr_style_category .. "DR200")
+            apply_tag(image, "DR200")
+            --dt.print_log("[fujifilm_auto_settings] DR200 applied")
+        elseif auto_dynamic_range == "400%" then
+            apply_style(image, dr_style_category .. "DR400")
+            apply_tag(image, "DR400")
+            --dt.print_log("[fujifilm_auto_settings] DR400 applied")
+        end
     end
 
     -- cropmode
@@ -279,44 +283,46 @@ local function detect_auto_settings(event, image)
     end
 
     -- filmmode
-    local filmmode_success = false
-    local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
-    local style_map = {
-        ["Provia"] = "Provia",
-        ["Astia"] = "Astia",
-        ["Classic Chrome"] = "Classic Chrome",
-        ["Eterna"] = "Eterna",
-        ["Pro Neg. Hi"] = "Pro Neg Hi",
-        ["Pro Neg. Std"] = "Pro Neg Std",
-        ["Velvia"] = "Velvia",
-        ["Classic Negative"] = "Classic Negative"
-    }
+    if apply_film_styles then
+        local filmmode_success = false
+        local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
+        local style_map = {
+            ["Provia"] = "Provia",
+            ["Astia"] = "Astia",
+            ["Classic Chrome"] = "Classic Chrome",
+            ["Eterna"] = "Eterna",
+            ["Pro Neg. Hi"] = "Pro Neg Hi",
+            ["Pro Neg. Std"] = "Pro Neg Std",
+            ["Velvia"] = "Velvia",
+            ["Classic Negative"] = "Classic Negative"
+        }
 
-    -- If we get a filmmode back then it's a color simulation
-    if raw_filmmode then
-        for key, value in pairs(style_map) do
-            if string.find(raw_filmmode, key) then
-                apply_style(image, lut_style_category .. value)
-                apply_tag(image, key)
-                filmmode_success = true
-                --dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
-                break
+        -- If we get a filmmode back then it's a color simulation
+        if raw_filmmode then
+            for key, value in pairs(style_map) do
+                if string.find(raw_filmmode, key) then
+                    apply_style(image, lut_style_category .. value)
+                    apply_tag(image, key)
+                    filmmode_success = true
+                    --dt.print_log("[fujifilm_auto_settings] color film simulation style map found: " .. key)
+                    break
+                end
             end
-        end
 
-        if not filmmode_success then
-            dt.print_log("[fujifilm_auto_settings] -filmmode " .. raw_filmmode .. " does not match anything in color style_map")
+            if not filmmode_success then
+                dt.print_log("[fujifilm_auto_settings] -filmmode " .. raw_filmmode .. " does not match anything in color style_map")
+            end
+        -- If a film returns empty, it might be a black&white simulation    
+        else
+            --dt.print_log("[fujifilm_auto_settings] -filmmode returned empty")
+            --dt.print_log("[fujifilm_auto_settings] checking -saturation in for b&w styles...")
+            -- Check to see if it matches a supported b&w film simulation
+            filmmode_success = find_bw_filmmode(exiftool_command, RAF_filename, image)
         end
-    -- If a film returns empty, it might be a black&white simulation    
-    else
-        --dt.print_log("[fujifilm_auto_settings] -filmmode returned empty")
-        --dt.print_log("[fujifilm_auto_settings] checking -saturation in for b&w styles...")
-        -- Check to see if it matches a supported b&w film simulation
-        filmmode_success = find_bw_filmmode(exiftool_command, RAF_filename, image)
-    end
-    
-    if not filmmode_success then
-        dt.print_log("[fujifilm_auto_settings] neither -filmmode or -saturation matched anything in their style_map's")
+        
+        if not filmmode_success then
+            dt.print_log("[fujifilm_auto_settings] neither -filmmode or -saturation matched anything in their style_map's")
+        end
     end
 end
 
