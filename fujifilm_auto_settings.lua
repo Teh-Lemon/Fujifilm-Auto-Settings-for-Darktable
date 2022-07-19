@@ -1,3 +1,4 @@
+-- Lemon Fork v1.0 (2022/07/19) - https://github.com/Teh-Lemon/Fujifilm-Auto-Settings-for-Darktable/tree/Lemon
 -- User Settings
 local os_is_windows = true --change to false if you're using Linux
 local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
@@ -7,7 +8,6 @@ local crop_style_category = "Fujifilm Crops|"
 local apply_dr_styles = true -- Whether to apply the DR styles
 local apply_crop_styles = false -- Whether to apply the crop styles
 local apply_film_styles = true -- Whether to apply the film styles
-
 
 --[[ fujifilm_auto_settings-0.3
 
