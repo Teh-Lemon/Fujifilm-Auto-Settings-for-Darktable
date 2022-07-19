@@ -222,17 +222,17 @@ local function detect_auto_settings(event, image)
             -- default; no need to apply style
         elseif raw_aspect_ratio == "1:1" then
             if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
-                apply_style(image, crop_style_category .. "square_crop_landscape")
+                apply_style(image, crop_style_category .. "1:1 Landscape")
             else
-                apply_style(image, crop_style_category .. "square_crop_portrait")
+                apply_style(image, crop_style_category .. "1:1 Portrait")
             end
             apply_tag(image, "1:1")
             dt.print_log("[fujifilm_auto_settings] square crop")
         elseif raw_aspect_ratio == "16:9" then
             if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
-                apply_style(image, crop_style_category .. "sixteen_by_nine_crop_landscape")
+                apply_style(image, crop_style_category .. "16:9 Landscape")
             else
-                apply_style(image, crop_style_category .. "sixteen_by_nine_crop_portrait")
+                apply_style(image, crop_style_category .. "16:9 Portrait")
             end
             apply_tag(image, "16:9")
             dt.print_log("[fujifilm_auto_settings] 16:9 crop")
@@ -241,8 +241,7 @@ local function detect_auto_settings(event, image)
 
     -- filmmode
     if apply_film_styles then
-        local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
-        local raw_saturation = exiftool_get(exiftool_command, RAF_filename, "-Saturation")
+        local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")        
         -- Check if it's a color film mode
         if raw_filmmode then
             local style_map = {
@@ -264,29 +263,32 @@ local function detect_auto_settings(event, image)
                 end
             end
         -- else check if it's a b&w film mode
-        elseif raw_saturation then
-            local style_map = {
-                ["Acros Green Filter"] = "Acros G",
-                ["Acros Red Filter"] = "Acros R",
-                ["Acros Yellow Filter"] = "Acros Ye",
-                ["Acros"] = "Acros",
-                -- Unsupported film modes since I've never seen anyone use them
-                ["None (B&W)"] = "Acros",
-                ["B&W Green Filter"] = "Acros G",
-                ["B&W Red Filter"] = "Acros R",
-                ["B&W Yellow Filter"] = "Acros Ye",
-                ["B&W Sepia"] = "Acros"
-            }
-            for key, value in pairs(style_map) do
-                if raw_saturation == key then
-                    apply_style(image, lut_style_category .. value)
-                    apply_tag(image, key)
-                    dt.print_log("[fujifilm_auto_settings] b&w film simulation: " .. key)
-                    break
-                end
-            end
         else
-            dt.print_log("[fujifilm_auto_settings] neither -filmmode or -saturation was found")
+            local raw_saturation = exiftool_get(exiftool_command, RAF_filename, "-Saturation")
+            if raw_saturation then
+                local style_map = {
+                    ["Acros Green Filter"] = "Acros G",
+                    ["Acros Red Filter"] = "Acros R",
+                    ["Acros Yellow Filter"] = "Acros Ye",
+                    ["Acros"] = "Acros",
+                    -- Unsupported film modes since I've never seen anyone use them
+                    ["None (B&W)"] = "Acros",
+                    ["B&W Green Filter"] = "Acros G",
+                    ["B&W Red Filter"] = "Acros R",
+                    ["B&W Yellow Filter"] = "Acros Ye",
+                    ["B&W Sepia"] = "Acros"
+                }
+                for key, value in pairs(style_map) do
+                    if raw_saturation == key then
+                        apply_style(image, lut_style_category .. value)
+                        apply_tag(image, key)
+                        dt.print_log("[fujifilm_auto_settings] b&w film simulation: " .. key)
+                        break
+                    end
+                end
+            else
+                dt.print_log("[fujifilm_auto_settings] neither -filmmode or -saturation was found")
+            end
         end
     end
 end
