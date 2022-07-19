@@ -1,3 +1,8 @@
+-- User Settings
+local os_is_windows = true --change to false if you're using Linux
+local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
+local dr_style_category = "Fujifilm DR|"
+
 --[[ fujifilm_auto_settings-0.3
 
 Apply Fujifilm film simulations, in-camera crop mode, and dynamic range.
@@ -43,22 +48,7 @@ posterization artifact when loaded in Darktable, which the 3DLs do
 not).
 
 In order to use this plugin, you must prepare a number of styles:
-- provia
-- astia
-- velvia
-- classic_chrome
-- pro_neg_standard
-- pro_neg_high
-- eterna
-- acros_green
-- acros_red
-- acros_yellow
-- acros
-- mono_green
-- mono_red
-- mono_yellow
-- mono
-- sepia
+* Import the styles found in the "Categorized Styles" folder
 
 These styles should apply the according film simulation in a method of
 your choosing.
@@ -109,11 +99,6 @@ These tags have been checked on a Fujifilm X-T3 and X-Pro2. Other
 cameras may behave in other ways.
 
 --]]
-
--- Lemon variables
-local os_is_windows = true --change to false if you're using Linux
-local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
-local dr_style_category = "Fujifilm DR|"
 
 local dt = require "darktable"
 local du = require "lib/dtutils"
