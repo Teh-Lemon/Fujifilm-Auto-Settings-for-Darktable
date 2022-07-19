@@ -1,8 +1,11 @@
 ## Lemon Fork Changes
 
 * Ported to Windows
-* Disabled Aspect Ratio styles (I don't use them)   
+    * Set `os_is_windows = false` at the top of the script file if you're on Linux
+* Toggle the features on/off at the top of the script file
+    * Crop styles are disabled by default
 * Categorized the styles in Darktable
+    * You can customize the categories at the top of the file if you're using your own styles.
 * ~~Converted Bastibe's HaldCLUT LUTs to g'mic compressed LUTs~~ 
     * These are broken right now. Styles use the original .png LUTs
 * Added Acros and Classic Neg LUTs as g'mic compressed LUTs
@@ -10,6 +13,7 @@
     * Classic Neg is provided by [Marc R. Photography](https://marcrphoto.wordpress.com/2021/03/25/picturefx-pro-fujifilm-superia-200/)
 * Fixes all the broken film simulation detections
     * Note: I did not add LUTs for the Monochrome/Sepia simulations - These fallback to Acros styles
+* Fixes the landscape/portrait crop detection
 * Not-rigorously tested using photos from an X-T20. Use at your own risk.
 ## Lemon Fork Install Instructions
 
