@@ -3,6 +3,8 @@ local os_is_windows = true --change to false if you're using Linux
 local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
 local dr_style_category = "Fujifilm DR|"
 
+local apply_crop_styles = false -- Set to true if you want the script to apply the crop styles
+
 --[[ fujifilm_auto_settings-0.3
 
 Apply Fujifilm film simulations, in-camera crop mode, and dynamic range.
@@ -249,30 +251,33 @@ local function detect_auto_settings(event, image)
         apply_tag(image, "DR400")
         --dt.print_log("[fujifilm_auto_settings] DR400 applied")
     end
---[[
+
     -- cropmode
-    local raw_aspect_ratio = exiftool_get(exiftool_command, RAF_filename, "-RawImageAspectRatio")
-    if raw_aspect_ratio == "3:2" then
-        apply_tag(image, "3:2")
-        -- default; no need to apply style
-    elseif raw_aspect_ratio == "1:1" then
-        if image.width > image.height then
-            apply_style(image, "square_crop_landscape")
-        else
-            apply_style(image, "square_crop_portrait")
+    if apply_crop_styles then
+        local raw_aspect_ratio = exiftool_get(exiftool_command, RAF_filename, "-RawImageAspectRatio")
+        local raw_orientation = exiftool_get(exiftool_command, RAF_filename, "-Orientation")
+        if raw_aspect_ratio == "3:2" then
+            apply_tag(image, "3:2")
+            -- default; no need to apply style
+        elseif raw_aspect_ratio == "1:1" then
+            if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
+                apply_style(image, "square_crop_landscape")
+            else
+                apply_style(image, "square_crop_portrait")
+            end
+            apply_tag(image, "1:1")
+            dt.print_log("[fujifilm_auto_settings] square crop")
+        elseif raw_aspect_ratio == "16:9" then
+            if raw_orientation == "Horizontal (normal)" or raw_orientation == "Rotate 180" then
+                apply_style(image, "sixteen_by_nine_crop_landscape")
+            else
+                apply_style(image, "sixteen_by_nine_crop_portrait")
+            end
+            apply_tag(image, "16:9")
+            dt.print_log("[fujifilm_auto_settings] 16:9 crop")
         end
-        apply_tag(image, "1:1")
-        dt.print_log("[fujifilm_auto_settings] square crop")
-    elseif raw_aspect_ratio == "16:9" then
-        if image.width > image.height then
-            apply_style(image, "sixteen_by_nine_crop_landscape")
-        else
-            apply_style(image, "sixteen_by_nine_crop_portrait")
-        end
-        apply_tag(image, "16:9")
-        dt.print_log("[fujifilm_auto_settings] 16:9 crop")
     end
---]]
+
     -- filmmode
     local filmmode_success = false
     local raw_filmmode = exiftool_get(exiftool_command, RAF_filename, "-FilmMode")
