@@ -111,6 +111,7 @@ cameras may behave in other ways.
 --]]
 
 -- Lemon variables
+local os_is_windows = true --change to false if you're using Linux
 local lut_style_category = "Fujifilm LUTs|" -- Set to "" if not using categories
 local dr_style_category = "Fujifilm DR|"
 
@@ -129,8 +130,12 @@ script_data.destroy_method = nil -- set to hide for libs since we can't destroy 
 script_data.restart = nil -- how to restart the (lib) script after it's been hidden - i.e. make it visible again
 
 local function exiftool_get(exiftool_command, RAF_filename, flag)
-    local command = '"' .. exiftool_command .. " " .. flag .. " -t " .. RAF_filename .. '"'
+    local command = exiftool_command .. " " .. flag .. " -t " .. RAF_filename
+    if os_is_windows then
+        command = '"' .. command .. '"'
+    end
     dt.print_log("[fujifilm_auto_settings] " .. command)
+
     local output = io.popen(command)
     local exiftool_result = output:read("*all")
     output:close()
