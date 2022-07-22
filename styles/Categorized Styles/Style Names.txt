@@ -12,6 +12,11 @@ Fujifilm LUTs|Pro Neg Hi
 Fujifilm LUTs|Pro Neg Std
 Fujifilm LUTs|Provia
 Fujifilm LUTs|Velvia
+Fujifilm LUTs|Monochrome
+Fujifilm LUTs|Monochrome G
+Fujifilm LUTs|Monochrome R
+Fujifilm LUTs|Monochrome Ye
+Fujifilm LUTs|Sepia
 
 PictureFX-Pro-Fujifilm-Superia-200 by Marc R. Photography
 Fujifilm LUTs|Classive Negative

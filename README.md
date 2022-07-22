@@ -1,4 +1,6 @@
-## Lemon Fork Changes
+## Lemon Fork
+
+Serves as my own personal script as well as experimental bed for upcoming changes to the original script.
 
 * Toggle the features on/off at the top of the script file
     * Crop styles are disabled by default
@@ -7,7 +9,6 @@
 * Added Acros and Classic Neg LUTs as g'mic compressed LUTs
     * Acros is provided by [Stuart Sowerby](https://blog.sowerby.me/fuji-film-simulation-profiles/)
     * Classic Neg is provided by [Marc R. Photography](https://marcrphoto.wordpress.com/2021/03/25/picturefx-pro-fujifilm-superia-200/)
-* Note: I did not add LUTs for the Monochrome/Sepia simulations - These fallback to Acros styles
 * Not-rigorously tested using photos from an X-T20. Use at your own risk.
 ## Lemon Fork Install Instructions
 

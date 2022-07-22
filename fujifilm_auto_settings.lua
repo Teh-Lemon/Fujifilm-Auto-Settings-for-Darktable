@@ -140,7 +140,7 @@ script_data.restart = nil -- how to restart the (lib) script after it's been hid
 local function exiftool(RAF_filename)
     local exiftool_command = df.check_if_bin_exists("exiftool")
     assert(exiftool_command, "[fujifilm_auto_settings] exiftool not found")
-    local command = exiftool_command .. " -t " .. RAF_filename
+    local command = exiftool_command .. " -AutoDynamicRange -DevelopmentDynamicRange -RawImageAspectRatio -Orientation -FilmMode -Saturation -t " .. RAF_filename
     -- on Windows, wrap the command in another pair of quotes:
     if exiftool_command:find(".exe") then
         command = '"' .. command .. '"'
@@ -272,15 +272,15 @@ local function detect_auto_settings(event, image)
         -- else check if it's a b&w film mode
         elseif raw_saturation then
             local style_map = {
+                ["Acros"] = "Acros",
                 ["Acros Green Filter"] = "Acros G",
                 ["Acros Red Filter"] = "Acros R",
                 ["Acros Yellow Filter"] = "Acros Ye",
-                ["Acros"] = "Acros",
-                ["None (B&W)"] = "Acros",
-                ["B&W Green Filter"] = "Acros G",
-                ["B&W Red Filter"] = "Acros R",
-                ["B&W Yellow Filter"] = "Acros Ye",
-                ["B&W Sepia"] = "Acros"
+                ["None (B&W)"] = "Monochrome",
+                ["B&W Green Filter"] = "Monochrome G",
+                ["B&W Red Filter"] = "Monochrome R",
+                ["B&W Yellow Filter"] = "Monochrome Ye",
+                ["B&W Sepia"] = "Sepia"
             }
             for key, value in pairs(style_map) do
                 if raw_saturation == key then
